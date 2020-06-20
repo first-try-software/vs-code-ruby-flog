@@ -4,6 +4,11 @@
   "description": "Ruby flog score in your editor",
   "version": "0.1.0",
   "publisher": "first-try-software",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/first-try-software/vs-code-ruby-flog.git"
+  },
+  "homepage": "https://github.com/first-try-software/vs-code-ruby-flog/blob/main/README.md",
   "engines": {
     "vscode": "^1.46.0"
   },
