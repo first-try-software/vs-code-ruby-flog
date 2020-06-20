@@ -5,11 +5,12 @@ let myStatusBarItem;
 
 function activate({subscriptions}) {
 
-  const myCommandId = 'ruby-flog.average';
+  const commandId = 'ruby-flog.average';
   myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
-  myStatusBarItem.command = myCommandId;
+  myStatusBarItem.command = commandId;
   subscriptions.push(myStatusBarItem);
 
+  subscriptions.push(vscode.commands.registerCommand(commandId, updateStatusBarItem));
   subscriptions.push(vscode.window.onDidChangeActiveTextEditor(updateStatusBarItem));
   subscriptions.push(vscode.workspace.onDidChangeTextDocument(updateStatusBarItem));
 
@@ -44,6 +45,6 @@ function flogCommand(documentText) {
 
 function updateFlogScore(flogResult) {
   const averageScore = flogResult.split("\n")[1].split(":")[0].trim();
-  myStatusBarItem.text = `Flog: ${averageScore}`;
+  myStatusBarItem.text = `Average Flog: ${averageScore}`;
   myStatusBarItem.show();
 }
