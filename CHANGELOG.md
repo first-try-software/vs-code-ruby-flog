@@ -2,6 +2,10 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.1.1
+
+- Adds icon
+
 ## 0.1.0
 
 - Initial release

@@ -1,4 +1,4 @@
-# ruby-flog README
+# ruby-flog
 
 ruby-flog allows you to see your Ruby code's flog score live as you change your code.
 
