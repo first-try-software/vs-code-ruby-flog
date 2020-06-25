@@ -122,7 +122,7 @@ function getActiveTextEditor() {
 }
 
 function showLoadingState() {
-  statusBarItem.text = "Calculating Flog $(tree-item-loading)";
+  statusBarItem.text = "Calculating Flog $(tree-item-loading~spin)";
   statusBarItem.show();
 }
 

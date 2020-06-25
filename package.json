@@ -2,7 +2,7 @@
   "name": "ruby-flog",
   "displayName": "Ruby Flog",
   "description": "Ruby flog score in your status bar",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "first-try-software",
   "repository": {
     "type": "git",
@@ -12,6 +12,7 @@
   "engines": {
     "vscode": "^1.46.0"
   },
+  "keywords": ["ruby", "complexity", "flog", "code complexity"],
   "categories": [
     "Other"
   ],

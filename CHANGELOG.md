@@ -2,6 +2,11 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.2.1
+
+- Fixes spinner that did not spin
+- Adds keywords
+
 ## 0.2.0
 
 - Adds ability to toggle between average and total flog
