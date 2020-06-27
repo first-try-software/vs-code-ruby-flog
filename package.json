@@ -2,7 +2,7 @@
   "name": "ruby-flog",
   "displayName": "Ruby Flog",
   "description": "Ruby flog score in your status bar",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "publisher": "first-try-software",
   "repository": {
     "type": "git",
@@ -25,14 +25,6 @@
     "onLanguage:ruby"
   ],
   "main": "./extension.js",
-    "contributes": {
-    "commands": [
-      {
-        "command": "ruby-flog.average",
-        "title": "Flog: Average Per Method"
-      }
-    ]
-  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "yarn run lint",

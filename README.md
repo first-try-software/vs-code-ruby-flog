@@ -1,7 +1,12 @@
 # Ruby Flog
 
 Ruby Flog is a Visual Studio Code plug-in that runs flog locally against your
-code and displays relevant metrics in the status bar.
+code and displays relevant metrics in the status bar. By default, it displays
+the average flog per method in the selected file. Or, you can select some text
+and Ruby Flog will display the total flog for the selected text. This is handy
+when you want to see if your refactoring had an effect on a method's flog.
+
+<img src="https://github.com/first-try-software/vs-code-ruby-flog/blob/main/images/RubyFlogDemo.gif" alt="Ruby Flog Demo">
 
 ## Requirements
 

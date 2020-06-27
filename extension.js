@@ -3,19 +3,12 @@ const cp = require('child_process');
 
 let statusBarItem;
 let handle;
-let mode = 'average';
 let state = 'deselected';
 let total;
 let average;
 
 function activate({subscriptions}) {
-  const commandId = 'ruby-flog.average';
-
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
-  statusBarItem.command = commandId;
-  subscriptions.push(statusBarItem);
-
-  subscriptions.push(vscode.commands.registerCommand(commandId, toggle));
   subscriptions.push(vscode.window.onDidChangeActiveTextEditor(initialize));
   subscriptions.push(vscode.window.onDidChangeTextEditorSelection(changeSelection));
   subscriptions.push(vscode.workspace.onDidChangeTextDocument(edit));
@@ -26,19 +19,15 @@ exports.activate = activate;
 
 // Private functions
 
-function debounce(updateMethod) {
-  clearTimeout(handle);
-  handle = setTimeout(updateMethod, 200);
-}
-
 function initialize() {
+  console.log("First Try! presents Ruby Flog!")
   transitionState('initialize');
   debounce(update);
 }
 
-function toggle() {
-  transitionMode();
-  render();
+function debounce(updateMethod) {
+  clearTimeout(handle);
+  handle = setTimeout(updateMethod, 200);
 }
 
 function edit() {
@@ -53,10 +42,6 @@ function changeSelection() {
     transitionState('deselect');
     debounce(update);
   }
-}
-
-function transitionMode() {
-  mode = mode === 'average' ? 'total' : 'average';
 }
 
 function transitionState(event) {
@@ -82,11 +67,11 @@ function update() {
 
 function render() {
   if (state === 'selected') {
-    showFlogScore(`Total Selected Flog: ${total}`);
-  } else if (mode === 'total') {
-    showFlogScore(`Total Flog: ${total}`);
+    showFlogScore(`Flog: ${total}`, `Total Flog for Selected Text: ${total}`);
   } else {
-    showFlogScore(`Average Flog: ${average}`);
+    let verified = "";
+    if (average < 10) { verified = " $(verified)"}
+    showFlogScore(`Flog: ${average}${verified}`, `Average Flog per Method: ${average}`);
   }
 }
 
@@ -122,12 +107,13 @@ function getActiveTextEditor() {
 }
 
 function showLoadingState() {
-  statusBarItem.text = "Calculating Flog $(tree-item-loading~spin)";
+  statusBarItem.text = "Flog: $(tree-item-loading~spin)";
   statusBarItem.show();
 }
 
-function showFlogScore(message) {
+function showFlogScore(message, tooltip) {
   statusBarItem.text = message;
+  statusBarItem.tooltip = tooltip;
   statusBarItem.show();
 }
 

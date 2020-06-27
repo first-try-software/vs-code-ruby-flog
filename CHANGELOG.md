@@ -2,6 +2,12 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.3.0
+
+- Adds tooltip
+- Reduces width on status bar
+- Removes ability to toggle between average and total flog
+
 ## 0.2.1
 
 - Fixes spinner that did not spin
