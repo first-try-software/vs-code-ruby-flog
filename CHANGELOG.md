@@ -2,6 +2,10 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.3.1
+
+- Fixes issue with image in README
+
 ## 0.3.0
 
 - Adds tooltip
