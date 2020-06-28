@@ -2,10 +2,9 @@ const vscode = require('vscode');
 const cp = require('child_process');
 
 let statusBarItem;
-let handle;
+let timeoutId;
 let state = 'deselected';
-let total;
-let average;
+let greeted = false;
 
 function activate({subscriptions}) {
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
@@ -19,15 +18,22 @@ exports.activate = activate;
 
 // Private functions
 
+function greet() {
+  if (!greeted) {
+    console.log("First Try! presents Ruby Flog!");
+    greeted = true;
+  }
+}
+
 function initialize() {
-  console.log("First Try! presents Ruby Flog!")
+  greet();
   transitionState('initialize');
   debounce(update);
 }
 
 function debounce(updateMethod) {
-  clearTimeout(handle);
-  handle = setTimeout(updateMethod, 200);
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(updateMethod, 200);
 }
 
 function edit() {
@@ -49,45 +55,58 @@ function transitionState(event) {
 }
 
 function update() {
-  const text = state === 'selected' ? getText(getSelection()) : getText();
-  if (text === undefined) { return; }
-
-  showLoadingState();
-
-  cp.exec(flogCommand(text), (err, stdout) => {
-    if (err) { return; }
-
-    const scores = getFlogScores(stdout);
-    total = scores.total;
-    average = scores.average;
-
-    render();
-  });
+  if (state === 'selected') {
+    updateFromSelection();
+  } else {
+    updateFromFile();
+  }
 }
 
-function render() {
+function updateFromSelection() {
+  executeCommand(getFlogFromText(getSelectedText()));
+}
+
+function updateFromFile() {
+  const document = getActiveDocument();
+  if (!isValidDocument(document)) { return statusBarItem.hide(); }
+
+  const fileName = document.fileName;
+  if (fileName === undefined) { return statusBarItem.hide(); }
+
+  executeCommand(getFlogFromFile(fileName));
+}
+
+function executeCommand(command) {
+  showLoadingState();
+  cp.exec(command, updateFlogScores);
+}
+
+function updateFlogScores(err, stdout) {
+  if (err) {
+    return updateStatusBarItem("Flog: $(warning)", "Error parsing selected text");
+  }
+
+  render(getFlogScores(stdout));
+}
+
+function render({ total, average }) {
   if (state === 'selected') {
-    showFlogScore(`Flog: ${total}`, `Total Flog for Selected Text: ${total}`);
+    updateStatusBarItem(`Flog: ${total}`, `Total Flog for Selected Text: ${total}`);
   } else {
     let verified = "";
     if (average < 10) { verified = " $(verified)"}
-    showFlogScore(`Flog: ${average}${verified}`, `Average Flog per Method: ${average}`);
+    updateStatusBarItem(`Flog: ${average}${verified}`, `Average Flog per Method: ${average}`);
   }
 }
 
-function getText(range) {
+function getSelectedText() {
+  const range = getSelection();
+  if (range === undefined || range.isEmpty) { return; }
+
   const document = getActiveDocument();
+  if (!isValidDocument(document)) { return statusBarItem.hide(); }
 
-  if (!isValidDocument(document)) {
-    statusBarItem.hide();
-    return;
-  }
-
-  if (range === undefined || range.isEmpty) {
-    return document.getText();
-  } else {
-    return document.getText(range);
-  }
+  return document.getText(range);
 }
 
 function getActiveDocument() {
@@ -111,7 +130,7 @@ function showLoadingState() {
   statusBarItem.show();
 }
 
-function showFlogScore(message, tooltip) {
+function updateStatusBarItem(message, tooltip) {
   statusBarItem.text = message;
   statusBarItem.tooltip = tooltip;
   statusBarItem.show();
@@ -131,7 +150,11 @@ function getFlogScores(flogResult) {
   return { total, average };
 }
 
-function flogCommand(text) {
+function getFlogFromFile(file) {
+  return `flog -s ${file}`
+}
+
+function getFlogFromText(text) {
   const escapedText = text.replace(/"/g, '\\"');
   const changeToStdin = `echo "${escapedText}"`;
   const flogFromStdin = `ruby -e "require 'flog_cli'; FlogCLI.new(FlogCLI.parse_options(ARGV)).tap { |f| f.flog('-'); f.report }"`;

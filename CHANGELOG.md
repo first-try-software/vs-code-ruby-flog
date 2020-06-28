@@ -2,6 +2,11 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.4.0
+
+- Fixes error processing large files
+- Adds error messaging when unable to parse text
+
 ## 0.3.1
 
 - Fixes issue with image in README
