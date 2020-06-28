@@ -5,6 +5,7 @@ let statusBarItem;
 let timeoutId;
 let state = 'deselected';
 let greeted = false;
+let flogInstalled;
 
 function activate({subscriptions}) {
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
@@ -27,8 +28,15 @@ function greet() {
 
 function initialize() {
   greet();
+  checkFlogInstalled();
   transitionState('initialize');
   debounce(update);
+}
+
+function checkFlogInstalled() {
+  cp.exec('which flog', (err) => {
+    flogInstalled = !err;
+  });
 }
 
 function debounce(updateMethod) {
@@ -57,13 +65,19 @@ function transitionState(event) {
 function update() {
   if (state === 'selected') {
     updateFromSelection();
-  } else {
+  } else if (flogInstalled) {
     updateFromFile();
+  } else {
+    updateFromText();
   }
 }
 
 function updateFromSelection() {
   executeCommand(getFlogFromText(getSelectedText()));
+}
+
+function updateFromText() {
+  executeCommand(getFlogFromText(getAllText()));
 }
 
 function updateFromFile() {
@@ -107,6 +121,13 @@ function getSelectedText() {
   if (!isValidDocument(document)) { return statusBarItem.hide(); }
 
   return document.getText(range);
+}
+
+function getAllText() {
+  const document = getActiveDocument();
+  if (!isValidDocument(document)) { return statusBarItem.hide(); }
+
+  return document.getText();
 }
 
 function getActiveDocument() {
