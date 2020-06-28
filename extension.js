@@ -92,7 +92,11 @@ function updateFromFile() {
 
 function executeCommand(command) {
   showLoadingState();
-  cp.exec(command, updateFlogScores);
+  try {
+    cp.exec(command, updateFlogScores);
+  } catch (error) {
+    updateStatusBarItem("Flog: $(warning)", "File too large to parse");
+  }
 }
 
 function updateFlogScores(err, stdout) {

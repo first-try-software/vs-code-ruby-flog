@@ -2,6 +2,10 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.4.2
+
+- Adds error messaging when file too large to parse
+
 ## 0.4.1
 
 - Fixes issue when flog executable is unavailable
