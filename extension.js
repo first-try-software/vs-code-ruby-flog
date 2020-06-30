@@ -3,40 +3,70 @@ const cp = require('child_process');
 
 let statusBarItem;
 let timeoutId;
-let state = 'deselected';
-let greeted = false;
+let initialized = false;
+let rubyInstalled;
 let flogInstalled;
 
 function activate({subscriptions}) {
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
-  subscriptions.push(vscode.window.onDidChangeActiveTextEditor(initialize));
-  subscriptions.push(vscode.window.onDidChangeTextEditorSelection(changeSelection));
+  subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => debounce(update)));
+  subscriptions.push(vscode.window.onDidChangeTextEditorSelection(() => debounce(update)));
   subscriptions.push(vscode.workspace.onDidChangeTextDocument(edit));
 
   initialize();
+  debounce(update);
 }
 exports.activate = activate;
 
 // Private functions
 
-function greet() {
-  if (!greeted) {
-    console.log("First Try! presents Ruby Flog!");
-    greeted = true;
+function initialize() {
+  if (!initialized) {
+    console.log("First Try! Software presents Ruby Flog!");
+    checkDependenciesInstalled();
+    initialized = true;
   }
 }
 
-function initialize() {
-  greet();
-  checkFlogInstalled();
-  transitionState('initialize');
-  debounce(update);
+function checkDependenciesInstalled() {
+  cp.exec('which ruby', (err) => {
+    rubyInstalled = !err;
+    if (rubyInstalled) {
+      checkFlogInstalled();
+    } else {
+      vscode.window.showWarningMessage('Please install Ruby in order to use Ruby Flog.');
+    }
+  });
 }
 
 function checkFlogInstalled() {
-  cp.exec('which flog', (err) => {
-    flogInstalled = !err;
-  });
+  cp.exec('which flog', handleWhichFlog);
+}
+
+function handleWhichFlog(err) {
+  flogInstalled = !err;
+  if (!flogInstalled) {
+    vscode.window.showWarningMessage(
+      'Please install Flog in order to use Ruby Flog.',
+      'Install Now', 'Remind Me Later'
+    ).then(handleFlogInstallationDialogResponse);
+  }
+}
+
+function handleFlogInstallationDialogResponse(selectedOption) {
+  if (selectedOption === 'Install Now') {
+    cp.exec('gem install flog', handleFlogInstall);
+  }
+}
+
+function handleFlogInstall(err) {
+  if (!!err) {
+    vscode.window.showErrorMessage('Unable to install Flog.');
+  } else {
+    vscode.window.showInformationMessage('Flog successfully installed.')
+    flogInstalled = true;
+    update();
+  }
 }
 
 function debounce(updateMethod) {
@@ -48,22 +78,12 @@ function edit() {
   debounce(update);
 }
 
-function changeSelection() {
-  if (!getSelection().isEmpty) {
-    transitionState('select');
-    debounce(update);
-  } else if (state === 'selected') {
-    transitionState('deselect');
-    debounce(update);
-  }
-}
-
-function transitionState(event) {
-  state = event === 'select' ? 'selected' : 'deselected';
+function isTextSelected() {
+  return !!getSelectedText();
 }
 
 function update() {
-  if (state === 'selected') {
+  if (isTextSelected()) {
     updateFromSelection();
   } else if (flogInstalled) {
     updateFromFile();
@@ -95,20 +115,26 @@ function executeCommand(command) {
   try {
     cp.exec(command, updateFlogScores);
   } catch (error) {
-    updateStatusBarItem("Flog: $(warning)", "File too large to parse");
+    updateStatusBarItem("Flog: $(warning)", "Ruby Flog could not parse the file. It is too large.");
   }
 }
 
 function updateFlogScores(err, stdout) {
   if (err) {
-    return updateStatusBarItem("Flog: $(warning)", "Error parsing selected text");
+    if (rubyInstalled && flogInstalled) {
+      return updateStatusBarItem("Flog: $(warning)", "Ruby Flog could not parse the selected text.");
+    } else if (rubyInstalled) {
+      return updateStatusBarItem("Flog: $(warning)", "Please install Flog in order to use Ruby Flog.");
+    } else {
+      return updateStatusBarItem("Flog: $(warning)", "Please install Ruby in order to use Ruby Flog.");
+    }
   }
 
   render(getFlogScores(stdout));
 }
 
 function render({ total, average }) {
-  if (state === 'selected') {
+  if (isTextSelected()) {
     updateStatusBarItem(`Flog: ${total}`, `Total Flog for Selected Text: ${total}`);
   } else {
     let verified = "";

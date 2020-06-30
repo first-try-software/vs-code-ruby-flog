@@ -2,6 +2,14 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.5.0
+
+- Detects lack of dependencies
+- Notifies if Ruby is not installed (once per session)
+- Offers to install flog (once per session)
+- Installs flog
+- Fixes issue when text is selected upon activation
+
 ## 0.4.2
 
 - Adds error messaging when file too large to parse
