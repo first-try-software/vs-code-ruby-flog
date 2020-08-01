@@ -2,6 +2,7 @@ const debounce = require("lodash.debounce");
 const autobind = require("class-autobind");
 const { FlogCLI } = require('./flogCli');
 const { Renderer } = require("./renderer");
+const { Updater } = require("./updater");
 
 class Extension {
   constructor({ window, workspace, subscriptions, statusBarItem }) {
@@ -38,96 +39,34 @@ class Extension {
     }
   }
 
-  isTextSelected() {
-    return !this.getSelection().isEmpty;
+  getActiveTextEditor() {
+    return this.window.activeTextEditor || {};
+  }
+
+  isRubyDocument() {
+    const { document } = this.getActiveTextEditor();
+    return document !== undefined && document.languageId === "ruby";
   }
 
   updateScores() {
-    this.showLoadingState();
+    if (!this.isRubyDocument()) { return this.statusBarItem.hide(); }
 
-    if (this.isTextSelected()) {
-      this.updateFromSelection();
-    } else if (this.flogCLI.isFlogInstalled) {
-      this.updateFromFile();
-    } else {
-      this.updateFromText();
-    }
+    const updater = new Updater({
+      show: this.show.bind(this),
+      flogCLI: this.flogCLI,
+      activeTextEditor: this.getActiveTextEditor(),
+      flogExecutable: this.workspace.getConfiguration("ruby-flog").get("flogExecutable")
+    });
+
+    updater.update();
   }
 
-  updateFromSelection() {
-    this.flogCLI.getFlogFromText(this.getSelectedText(), this.render.bind(this));
-  }
+  show({ isLoading = false, ...result } = {}) {
+    const renderer = new Renderer({ isLoading, ...result });
 
-  updateFromText() {
-    this.flogCLI.getFlogFromText(this.getAllText(), this.render.bind(this));
-  }
-
-  updateFromFile() {
-    const flogExecutable = this.workspace.getConfiguration("ruby-flog").get("flogExecutable");
-    this.flogCLI.getFlogFromFile(this.getFileName(), this.render.bind(this), flogExecutable);
-  }
-
-  render(flogResult) {
-    const isSelectedText = this.isTextSelected()
-    const renderer = new Renderer({ isTextSelected: isSelectedText , ...flogResult });
-    this.updateStatusBarItem(renderer);
-  }
-
-  showLoadingState() {
-    this.statusBarItem.text = "Flog: $(tree-item-loading~spin)";
-    this.statusBarItem.show();
-  }
-
-  updateStatusBarItem(renderer) {
     this.statusBarItem.text = renderer.text();
     this.statusBarItem.tooltip = renderer.tooltip();
     this.statusBarItem.show();
-  }
-
-  getSelectedText() {
-    const range = this.getSelection();
-    if (range === undefined || range.isEmpty) { return; }
-
-    const document = this.getActiveDocument();
-    if (!this.isValidDocument(document)) { return this.statusBarItem.hide(); }
-
-    return document.getText(range);
-  }
-
-  getAllText() {
-    const document = this.getActiveDocument();
-    if (!this.isValidDocument(document)) { return this.statusBarItem.hide(); }
-
-    return document.getText();
-  }
-
-  getFileName() {
-    const document = this.getActiveDocument();
-    if (!this.isValidDocument(document)) { return this.statusBarItem.hide(); }
-
-    return document.fileName;
-  }
-
-  getSelection() {
-    return this.getActiveTextEditor().selection;
-  }
-
-  getActiveDocument() {
-    const activeTextEditor = this.getActiveTextEditor();
-    if (activeTextEditor === undefined) { return; }
-
-    return activeTextEditor.document;
-  }
-
-  getActiveTextEditor() {
-    return this.window.activeTextEditor;
-  }
-
-  isValidDocument(document) {
-    return (
-      document !== undefined &&
-      document.languageId === 'ruby'
-    );
   }
 }
 
