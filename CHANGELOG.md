@@ -2,6 +2,10 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 0.5.1
+
+- Adds setting for configuring flog executable
+
 ## 0.5.0
 
 - Detects lack of dependencies

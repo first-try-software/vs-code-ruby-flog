@@ -2,7 +2,7 @@
   "name": "ruby-flog",
   "displayName": "Ruby Flog",
   "description": "Ruby flog score in your status bar",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "publisher": "first-try-software",
   "repository": {
     "type": "git",
@@ -30,6 +30,20 @@
     "onLanguage:ruby"
   ],
   "main": "./extension/rubyFlog.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Ruby Flog",
+      "properties": {
+        "ruby-flog.flogExecutable": {
+          "type": "string",
+          "default": "flog",
+          "description": "Path to flog executable",
+          "scope": "resource"
+        }
+      }
+    }
+  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "yarn run lint",
