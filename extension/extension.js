@@ -63,7 +63,8 @@ class Extension {
   }
 
   updateFromFile() {
-    this.flogCLI.getFlogFromFile(this.getFileName(), this.render.bind(this));
+    const flogExecutable = this.workspace.getConfiguration("ruby-flog").get("flogExecutable");
+    this.flogCLI.getFlogFromFile(this.getFileName(), this.render.bind(this), flogExecutable);
   }
 
   render(flogResult) {

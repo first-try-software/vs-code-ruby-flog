@@ -1,16 +1,20 @@
 const cp = require('child_process');
 
 class FlogCLI {
+  constructor({ flogExecutable } = {}) {
+    this.flogExecutable = flogExecutable || "flog";
+  }
+
   checkFlogInstalled() {
     cp.exec('which flog', (err) => {
       this.isFlogInstalled = !err;
     });
   }
 
-  getFlogFromFile(file, callback) {
+  getFlogFromFile(file, callback, flogExecutable = "flog") {
     if (!file) { return; }
 
-    this.executeCommand(`flog -s ${file}`, callback)
+    this.executeCommand(`${flogExecutable} -s ${file}`, callback)
   }
 
   getFlogFromText(text, callback) {

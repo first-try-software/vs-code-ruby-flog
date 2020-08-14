@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const { FlogCLI } = require('../../extension/flogCli');
 
 describe('FlogCLI', () => {
-  const cli = new FlogCLI();
+  let cli = new FlogCLI();
 
   describe('#getFlogFromFile()', () => {
     describe('when file is undefined', () => {
@@ -26,11 +26,25 @@ describe('FlogCLI', () => {
         sandbox.restore();
       });
 
-      it('executes the correct command', () => {
-        cli.getFlogFromFile('test.rb', () => {});
+      describe('when a flogExecutable is NOT provided', () => {
+        let cli = new FlogCLI();
 
-        expect(cp.exec.getCall(0).args[0]).to.eql('flog -s test.rb')
-      });
+        it('executes the correct command', () => {
+          cli.getFlogFromFile('test.rb', () => {});
+
+          expect(cp.exec.getCall(0).args[0]).to.eql('flog -s test.rb')
+        });
+      })
+
+      describe('when a flogExecutable is provided', () => {
+        let cli = new FlogCLI();
+
+        it('executes the correct command', () => {
+          cli.getFlogFromFile('test.rb', () => {}, 'path/to/flog');
+
+          expect(cp.exec.getCall(0).args[0]).to.eql('path/to/flog -s test.rb')
+        });
+      })
 
       describe('when executing the command raises an error', () => {
         const callback = sinon.spy();
