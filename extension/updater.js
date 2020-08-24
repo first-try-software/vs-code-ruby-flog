@@ -11,10 +11,8 @@ class Updater {
 
     if (this.isTextSelected()) {
       this.updateFromSelection();
-    } else if (this.flogCLI.isFlogInstalled) {
-      this.updateFromFile();
     } else {
-      this.updateFromText();
+      this.updateFromFile();
     }
   }
 
@@ -32,10 +30,6 @@ class Updater {
     this.flogCLI.getFlogFromText(this.getSelectedText(), this.showResults.bind(this));
   }
 
-  updateFromText() {
-    this.flogCLI.getFlogFromText(this.getAllText(), this.showResults.bind(this));
-  }
-
   updateFromFile() {
     this.flogCLI.getFlogFromFile(this.getFileName(), this.showResults.bind(this), this.flogExecutable);
   }
@@ -45,10 +39,6 @@ class Updater {
     if (range === undefined || range.isEmpty) { return; }
 
     return this.getActiveDocument().getText(range);
-  }
-
-  getAllText() {
-    return this.getActiveDocument().getText();
   }
 
   getFileName() {

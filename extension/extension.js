@@ -28,7 +28,7 @@ class Extension {
 
   initialize() {
     this.greet();
-    this.flogCLI.checkFlogInstalled();
+    this.flogCLI.checkFlogInstalled(this.getFlogExecutable());
     this.update();
   }
 
@@ -55,10 +55,14 @@ class Extension {
       show: this.show.bind(this),
       flogCLI: this.flogCLI,
       activeTextEditor: this.getActiveTextEditor(),
-      flogExecutable: this.workspace.getConfiguration("ruby-flog").get("flogExecutable")
+      flogExecutable: this.getFlogExecutable()
     });
 
     updater.update();
+  }
+
+  getFlogExecutable() {
+    return this.workspace.getConfiguration("ruby-flog").get("flogExecutable");
   }
 
   show({ isLoading = false, ...result } = {}) {

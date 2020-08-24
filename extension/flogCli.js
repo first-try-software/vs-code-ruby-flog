@@ -1,12 +1,8 @@
 const cp = require('child_process');
 
 class FlogCLI {
-  constructor({ flogExecutable } = {}) {
-    this.flogExecutable = flogExecutable || "flog";
-  }
-
-  checkFlogInstalled() {
-    cp.exec('which flog', (err) => {
+  checkFlogInstalled(flogExecutable = "flog") {
+    cp.exec(`which ${flogExecutable}`, (err) => {
       this.isFlogInstalled = !err;
     });
   }
@@ -30,7 +26,17 @@ class FlogCLI {
   // private methods
 
   parseResult(error, flogResult) {
-    if (error) { return { error: "Error parsing selected text" } };
+    let errorMessage;
+
+    if (error) {
+      if (this.isFlogInstalled) {
+        errorMessage = "Error parsing selected text";
+      } else {
+        errorMessage = "Unable to find flog executable specified in settings";
+      }
+
+      return { error: errorMessage }
+    };
 
     const lines = flogResult.split("\n");
     const total = lines[0].split(":")[0].trim();
