@@ -2,6 +2,10 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 1.0.1
+
+- Upgrades dependencies to address CVE
+
 ## 1.0.0
 
 - Sets meaningful error message when flog not found
