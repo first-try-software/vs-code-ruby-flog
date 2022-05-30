@@ -7,7 +7,7 @@ describe('Updater', () => {
     describe('always', () => {
       const show = sinon.spy();
       const flogCLI = { getFlogFromFile: () => {} };
-      const selection = { isEmpty: true };
+      const selection = { isEmpty: true, active: { line: 42 } };
       const document = { getText: () => '' };
       const activeTextEditor = { selection, document };
 
@@ -23,7 +23,7 @@ describe('Updater', () => {
     describe('when text is selected', () => {
       const show = sinon.spy();
       const flogCLI = { getFlogFromText: sinon.spy() };
-      const selection = { isEmpty: false };
+      const selection = { isEmpty: false, active: { line: 12 } };
       const text = 'text';
       const document = { getText: () => text };
       const activeTextEditor = { selection, document };
@@ -44,17 +44,21 @@ describe('Updater', () => {
         updater.update();
 
         const callback = flogCLI.getFlogFromText.getCall(0).args[1];
-        const results = { score: 42 };
+        const method = { score: 3.9, name: 'foo' };
+        const methods = { 11: method, 12: method, 13: method };
+        const total = 42;
+        const average = 24;
+        const results = { methods, total, average };
         callback(results);
 
-        expect(show.secondCall.args[0]).to.eql({ isTextSelected: true, ...results });
+        expect(show.secondCall.args[0]).to.eql({ isTextSelected: true, method, total, average });
       });
     });
 
     describe('when text is NOT selected', () => {
       const show = sinon.spy();
       const flogCLI = { getFlogFromFile: sinon.spy() };
-      const selection = { isEmpty: true };
+      const selection = { isEmpty: true, active: { line: 12 } };
       const fileName = 'fileName';
       const document = { fileName };
       const activeTextEditor = { selection, document };
@@ -76,10 +80,14 @@ describe('Updater', () => {
         updater.update();
 
         const callback = flogCLI.getFlogFromFile.getCall(0).args[1];
-        const results = { score: 42 };
+        const method = { score: 3.9, name: 'foo' };
+        const methods = { 11: method, 12: method, 13: method };
+        const total = 42;
+        const average = 24;
+        const results = { methods, total, average };
         callback(results);
 
-        expect(show.secondCall.args[0]).to.eql({ isTextSelected: false, ...results });
+        expect(show.secondCall.args[0]).to.eql({ isTextSelected: false, method, total, average });
       });
 
       it('passes the flog executable', () => {

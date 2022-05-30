@@ -32,7 +32,7 @@ describe('FlogCLI', () => {
         it('executes the correct command', () => {
           cli.getFlogFromFile('test.rb', () => {});
 
-          expect(cp.exec.getCall(0).args[0]).to.eql('flog -s test.rb')
+          expect(cp.exec.getCall(0).args[0]).to.eql('flog -am test.rb')
         });
       })
 
@@ -42,7 +42,7 @@ describe('FlogCLI', () => {
         it('executes the correct command', () => {
           cli.getFlogFromFile('test.rb', () => {}, 'path/to/flog');
 
-          expect(cp.exec.getCall(0).args[0]).to.eql('path/to/flog -s test.rb')
+          expect(cp.exec.getCall(0).args[0]).to.eql('path/to/flog -am test.rb')
         });
       })
 
@@ -85,9 +85,13 @@ describe('FlogCLI', () => {
       });
 
       describe('when there is NO error', () => {
-        const total = "total";
-        const average = "average";
-        const result = `${total}: total flog\n${average}: average flog`;
+        const total = "18.5";
+        const average = "3.1";
+        const method1 = { score: "5.2", name: "foo" };
+        const method2 = { score: "3.9", name: "bar" };
+        const methods = { 24: method1, 25: method1, 26: method1, 27: method1, 28: method1, 30: method2, 31: method2, 32: method2 }
+        const result = `${total}: flog total\n${average}: flog/method average\n\n5.2: Class1#foo class1.rb:24-27\n3.9: Class1#bar class1.rb:30-31`
+
         const callback = sinon.spy();
 
         beforeEach(() => {
@@ -102,7 +106,7 @@ describe('FlogCLI', () => {
         it('calls the callback with the results', () => {
           cli.getFlogFromFile('test.rb', callback);
 
-          expect(callback.getCall(0).args[0]).to.eql({ total, average })
+          expect(callback.getCall(0).args[0]).to.eql({ total, average, methods })
         });
       });
     });
@@ -175,9 +179,12 @@ describe('FlogCLI', () => {
       });
 
       describe('when there is NO error', () => {
-        const total = "total";
-        const average = "average";
-        const result = `${total}: total flog\n${average}: average flog`;
+        const total = "18.5";
+        const average = "3.1";
+        const method1 = { score: "5.2", name: "foo" };
+        const method2 = { score: "3.9", name: "bar" };
+        const methods = { 24: method1, 25: method1, 26: method1, 27: method1, 28: method1, 30: method2, 31: method2, 32: method2 }
+        const result = `${total}: flog total\n${average}: flog/method average\n\n5.2: Class1#foo class1.rb:24-27\n3.9: Class1#bar class1.rb:30-31`
         const callback = sinon.spy();
 
         beforeEach(() => {
@@ -192,7 +199,7 @@ describe('FlogCLI', () => {
         it('calls the callback with the results', () => {
           cli.getFlogFromText('1 + 1', callback);
 
-          expect(callback.getCall(0).args[0]).to.eql({ total, average })
+          expect(callback.getCall(0).args[0]).to.eql({ total, average, methods })
         });
       });
     });

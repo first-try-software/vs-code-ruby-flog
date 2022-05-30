@@ -23,7 +23,10 @@ class Updater {
   }
 
   showResults(results) {
-    this.show({ isTextSelected: this.isTextSelected(), ...results })
+    const { total, average, methods } = results;
+    const method = methods[this.getCursorLocation()];
+
+    this.show({ isTextSelected: this.isTextSelected(), total, average, method })
   }
 
   updateFromSelection() {
@@ -47,6 +50,11 @@ class Updater {
 
   getSelection() {
     return this.activeTextEditor.selection;
+  }
+
+  getCursorLocation() {
+    // Line numbers are zero-based
+    return this.getSelection().active.line + 1;
   }
 
   getActiveDocument() {

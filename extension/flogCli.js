@@ -10,7 +10,7 @@ class FlogCLI {
   getFlogFromFile(file, callback, flogExecutable = "flog") {
     if (!file) { return; }
 
-    this.executeCommand(`${flogExecutable} -s ${file}`, callback)
+    this.executeCommand(`${flogExecutable} -am ${file}`, callback)
   }
 
   getFlogFromText(text, callback) {
@@ -41,7 +41,14 @@ class FlogCLI {
     const lines = flogResult.split("\n");
     const total = lines[0].split(":")[0].trim();
     const average = lines[1].split(":")[0].trim();
-    return { total, average };
+    const methods = {};
+    const methodRegex = /(?<score>\d*\.\d):\s.*#(?<name>\w*).*:(?<start>\d*)-(?<end>\d*)/mg;
+    const methodMatches = [...flogResult.matchAll(methodRegex)].map(match => match.groups);
+    for (let { start, end, score, name } of methodMatches) {
+      for (let i = parseInt(start); i <= parseInt(end) + 1; i++) { methods[i] = { score, name }; }
+    }
+
+    return { total, average, methods };
   }
 
   executeCommand(command, callback) {
