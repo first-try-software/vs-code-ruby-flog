@@ -2,7 +2,7 @@
   "name": "ruby-flog",
   "displayName": "Ruby Flog",
   "description": "Ruby flog score in your status bar",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publisher": "first-try-software",
   "repository": {
     "type": "git",
