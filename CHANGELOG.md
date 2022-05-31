@@ -2,6 +2,10 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 1.1.1
+
+- Upgrades dependencies to address CVE
+
 ## 1.1.0
 
 - Adds flog score for current method
