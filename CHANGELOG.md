@@ -2,6 +2,13 @@
 
 All notable changes to the "ruby-flog" extension will be documented in this file.
 
+## 1.1.2
+
+- Improves flog process management and prevents memory leak
+- Times out flog processes after 10 seconds
+- Limits selected text to 2048 characters
+- Renders error tooltips when appropriate
+
 ## 1.1.1
 
 - Upgrades dependencies to address CVE
