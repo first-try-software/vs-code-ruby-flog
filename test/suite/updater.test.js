@@ -51,7 +51,7 @@ describe('Updater', () => {
         const results = { methods, total, average };
         callback(results);
 
-        expect(show.secondCall.args[0]).to.eql({ isTextSelected: true, method, total, average });
+        expect(show.secondCall.args[0]).to.eql({ isTextSelected: true, method, total, average, error: undefined });
       });
     });
 
@@ -87,7 +87,7 @@ describe('Updater', () => {
         const results = { methods, total, average };
         callback(results);
 
-        expect(show.secondCall.args[0]).to.eql({ isTextSelected: false, method, total, average });
+        expect(show.secondCall.args[0]).to.eql({ isTextSelected: false, method, total, average, error: undefined });
       });
 
       it('passes the flog executable', () => {

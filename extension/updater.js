@@ -23,10 +23,10 @@ class Updater {
   }
 
   showResults(results) {
-    const { total, average, methods } = results;
-    const method = methods[this.getCursorLocation()];
+    const { total, average, methods, error } = results;
+    const method = methods ? methods[this.getCursorLocation()] : undefined;
 
-    this.show({ isTextSelected: this.isTextSelected(), total, average, method })
+    this.show({ isTextSelected: this.isTextSelected(), total, average, method, error })
   }
 
   updateFromSelection() {

@@ -2,9 +2,11 @@ const cp = require('child_process');
 const expect = require('expect.js');
 const sinon = require('sinon');
 const { FlogCLI } = require('../../extension/flogCli');
+const { CLIRegistry } = require('../../extension/cliRegistry');
 
 describe('FlogCLI', () => {
-  let cli = new FlogCLI();
+  let registry = new CLIRegistry();
+  let cli = new FlogCLI(registry);
 
   describe('#getFlogFromFile()', () => {
     describe('when file is undefined', () => {
@@ -27,7 +29,7 @@ describe('FlogCLI', () => {
       });
 
       describe('when a flogExecutable is NOT provided', () => {
-        let cli = new FlogCLI();
+        let cli = new FlogCLI(registry);
 
         it('executes the correct command', () => {
           cli.getFlogFromFile('test.rb', () => {});
@@ -37,7 +39,7 @@ describe('FlogCLI', () => {
       })
 
       describe('when a flogExecutable is provided', () => {
-        let cli = new FlogCLI();
+        let cli = new FlogCLI(registry);
 
         it('executes the correct command', () => {
           cli.getFlogFromFile('test.rb', () => {}, 'path/to/flog');

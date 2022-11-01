@@ -1,6 +1,12 @@
 const cp = require('child_process');
+const maxCharsToParse = 2048;
+const commandTimeout = 10000; // 10 seconds
 
 class FlogCLI {
+  constructor(cliRegistry) {
+    this.cliRegistry = cliRegistry;
+  }
+
   checkFlogInstalled(flogExecutable = "flog") {
     cp.exec(`which ${flogExecutable}`, (err) => {
       this.isFlogInstalled = !err;
@@ -10,17 +16,25 @@ class FlogCLI {
   getFlogFromFile(file, callback, flogExecutable = "flog") {
     if (!file) { return; }
 
-    this.executeCommand(`${flogExecutable} -am ${file}`, callback)
+    this.cliRegistry.push(
+      this.executeCommand(`${flogExecutable} -am ${file}`, callback)
+    );
   }
 
   getFlogFromText(text, callback) {
     if (!text) { return; }
 
     const escapedText = text.replace(/"/g, '\\"');
+    if (escapedText.length >= maxCharsToParse) {
+      return callback({ error: `Selected text too long to parse - Limit = ${maxCharsToParse}` });
+    }
+
     const changeToStdin = `echo "${escapedText}"`;
     const flogFromStdin = `ruby -e "require 'flog_cli'; FlogCLI.new(FlogCLI.parse_options(ARGV)).tap { |f| f.flog('-'); f.report }"`;
 
-    this.executeCommand(`${changeToStdin} | ${flogFromStdin}`, callback);
+    this.cliRegistry.push(
+      this.executeCommand(`${changeToStdin} | ${flogFromStdin}`, callback)
+    );
   }
 
   // private methods
@@ -57,7 +71,7 @@ class FlogCLI {
     };
 
     try {
-      cp.exec(command, processResult);
+      return cp.exec(command, { timeout: commandTimeout }, processResult);
     } catch (error) {
       callback({ error: "File too large to parse" });
     }

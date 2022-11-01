@@ -1,6 +1,7 @@
 const debounce = require("lodash.debounce");
 const autobind = require("class-autobind");
 const { FlogCLI } = require('./flogCli');
+const { CLIRegistry } = require('./cliRegistry');
 const { Renderer } = require("./renderer");
 const { Updater } = require("./updater");
 
@@ -15,7 +16,8 @@ class Extension {
     autobind.default(this);
 
     this.update = debounce(this.updateScores, 500);
-    this.flogCLI = new FlogCLI();
+    this.cliRegistry = new CLIRegistry();
+    this.flogCLI = new FlogCLI(this.cliRegistry);
   }
 
   activate() {
@@ -28,6 +30,7 @@ class Extension {
 
   initialize() {
     this.greet();
+    this.cliRegistry.killAll();
     this.flogCLI.checkFlogInstalled(this.getFlogExecutable());
     this.update();
   }
